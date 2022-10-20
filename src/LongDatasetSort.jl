@@ -10,7 +10,10 @@ import
     InMemoryDatasets.MultiColumnIndex,
     InMemoryDatasets.Dataset
 
-export 
+const LDS = LongDatasetSort
+
+export
+    LDS,
     heapsort!,
     quicksort!,
     Dataset
