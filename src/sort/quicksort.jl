@@ -8,32 +8,32 @@
 
 # Use the Tuple only contains the sorting columns to compare
 # All equal, returen false
-@inline smaller(t::Tuple{}, i::Integer, j::Integer, revs::Tuple, formats::Tuple) = false
-@inline function smaller(t::Tuple, i::Integer, j::Integer, revs::Tuple, formats::Tuple)
+@inline smaller(ct::Tuple{}, i::Integer, j::Integer, revs::Tuple, formats::Tuple) = false
+@inline function smaller(ct::Tuple, i::Integer, j::Integer, revs::Tuple, formats::Tuple)
     @inbounds begin
-        col = first(t)
+        col = first(ct)
         rev = first(revs)
         format = first(formats)
-        ti = format(col[i])
-        tj = format(col[j])
-        isless(ti, tj) && return true ⊻ rev
-        isless(tj, ti) && return false ⊻ rev
+        cti = format(col[i])
+        ctj = format(col[j])
+        isless(cti, ctj) && return true ⊻ rev
+        isless(ctj, cti) && return false ⊻ rev
     end
-    return smaller(Base.tail(t), i, j, Base.tail(revs), Base.tail(formats))
+    return smaller(Base.tail(ct), i, j, Base.tail(revs), Base.tail(formats))
 end
 
-@inline smaller_or_equal(t::Tuple{}, i::Integer, j::Integer, revs::Tuple, formats::Tuple) = true
-@inline function smaller_or_equal(t::Tuple, i::Integer, j::Integer, revs::Tuple, formats::Tuple)
+@inline smaller_or_equal(ct::Tuple{}, i::Integer, j::Integer, revs::Tuple, formats::Tuple) = true
+@inline function smaller_or_equal(ct::Tuple, i::Integer, j::Integer, revs::Tuple, formats::Tuple)
     @inbounds begin
-        col = first(t)
+        col = first(ct)
         rev = first(revs)
         format = first(formats)
-        ti = format(col[i])
-        tj = format(col[j])
-        isless(ti, tj) && return true ⊻ rev
-        isless(tj, ti) && return false ⊻ rev
+        cti = format(col[i])
+        ctj = format(col[j])
+        isless(cti, ctj) && return true ⊻ rev
+        isless(ctj, cti) && return false ⊻ rev
     end
-    return smaller_or_equal(Base.tail(t), i, j, Base.tail(revs), Base.tail(formats))
+    return smaller_or_equal(Base.tail(ct), i, j, Base.tail(revs), Base.tail(formats))
 end
 
 # Use the Tuple of all columns to swap
@@ -47,6 +47,7 @@ end
     return nothing
 end
 
+# Swap for Quick Sort
 @inline function swap_df_3!(t::Tuple{AbstractVector}, lo, mi, hi)
     @inbounds t[1][hi], t[1][lo], t[1][mi] = t[1][lo], t[1][mi], t[1][hi]
     return nothing
@@ -90,16 +91,14 @@ end
     end
 end
 
-# partition!
-#
-# select a pivot, and partition v according to the pivot
-
+# select a pivot, and partition t according to the pivot
 function partition!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, lo::Integer, hi::Integer, revs::Tuple, formats::Tuple)
     pivot = selectpivot!(t, ct, lo, hi, revs, formats)
     # pivot == t[lo], t[hi] > t[pivot]
     i, j = lo, hi
     @inbounds while true
-        i += 1; j -= 1
+        i += 1
+        j -= 1
         while smaller(ct, i, pivot, revs, formats)
             i += 1
         end
@@ -119,7 +118,7 @@ end
 
 function qsort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, lo::Integer, hi::Integer, revs::Tuple, formats::Tuple)
     @inbounds while lo < hi
-        # hi-lo <= SMALL_THRESHOLD && return sort!(v, lo, hi, SMALL_ALGORITHM)
+        # TODO hi-lo <= SMALL_THRESHOLD && return sort!(v, lo, hi, SMALL_ALGORITHM)
 
         j = partition!(t, ct, lo, hi, revs, formats)
         if j-lo < hi-j
@@ -135,40 +134,10 @@ function qsort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVecto
     end
 end
 
-quicksort!(ds::AbstractDataset, col::ColumnIndex; rev = false, mapformats::Bool = true) = quicksort!(ds, [col]; rev = rev, mapformats = mapformats)
-function quicksort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats::Bool = true)
-    # Necessary?
-    #_check_consistency(ds)
-
-    # Get numeric index
-    colsidx = IMD.index(ds)[cols]
-
-    if Base.length(rev) == 1
-        revs = Tuple(repeat([rev], Base.length(colsidx)))
-    else
-        revs = Tuple(rev)
-    end
-    @assert Base.length(colsidx) == Base.length(revs) "the reverse argument must be the same length as the length of selected columns"
-
-    if mapformats
-        formats = Array{Function}(undef, Base.length(colsidx))
-        i = 1
-        @inbounds for colidx in colsidx
-            formats[i] = getformat(ds, colidx)
-            i += 1
-        end
-        formats = Tuple(formats)
-    else
-        formats = Tuple(repeat([identity], Base.length(colsidx)))
-    end
-
-    t = Tuple(IMD._columns(ds))
-    ct = t[colsidx]
-    len = Base.length(t[1])
+function sort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, revs::Tuple, formats::Tuple, ::QuickSortAlg)
     # 1 allocation less than nrow(ds)? If pass a fixed value, allocation will not increase
     # len = nrow(ds)
     # For example, qsort!(t, ct, 1, 200, revs, formats)
-    
+    len = Base.length(t[1])
     qsort!(t, ct, 1, len, revs, formats)
-    return ds
 end

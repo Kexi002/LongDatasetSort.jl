@@ -2,13 +2,13 @@ module LongDatasetSort
 
 using InMemoryDatasets
 
-const LMS = LongDatasetSort
-
 import
     InMemoryDatasets,
     InMemoryDatasets.ColumnIndex,
     InMemoryDatasets.MultiColumnIndex,
-    InMemoryDatasets.Dataset
+    InMemoryDatasets.Dataset,
+    InMemoryDatasets.HeapSortAlg,
+    Base.Sort.QuickSortAlg
 
 const LDS = LongDatasetSort
 
@@ -18,6 +18,7 @@ export
     quicksort!,
     Dataset
 
+include("sort/sort.jl")
 include("sort/heapsort.jl")
 include("sort/quicksort.jl")
 
