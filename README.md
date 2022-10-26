@@ -7,7 +7,7 @@
 # Features
 
 * No extra allocation created by sorting long `Dataset` 
-    * Allocation does not increase as the row number of the `Dataset` increases
+    * Allocation does not increase as the row number of the dataset increases
     * It will be fixed when the column number is less than or equals to 32
 
 * Provides Heap Sort and Quick Sort algorithms
@@ -192,9 +192,9 @@ julia> sort(ds, [1,2], mapformats = false)
 
 * Compare the running time and allocation with the `sort!` function of IMD. A computer with Windows system, 4 cores i5-7500 CPU and 16GB memory is used for the test. 
 
-* The testing `Dataset` is of type `Int64` with 1e2-?? rows and 32 columns. Randomly select 10 columns and convert them to Float type, and sort the `Dataset` in ascending order according to the first three columns.
+* The testing `Dataset` is of type `Int64` with 1e2-1e7 rows and 32 columns. Randomly select 10 columns and convert them to Float type, and sort the dataset in ascending order according to the first three columns.
 
-* The result is given by built-in macro @time. Each test run ten times and take the minimum value.
+* The result is given by built-in macro `@time`. Each test run ten times and take the minimum value.
 
 ## Heap Sort
 ### Running Time
