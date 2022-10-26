@@ -1,3 +1,6 @@
+#TODO: which is faster?
+#TODO: Fix the type of Tuple
+
 function heapify!(t::Tuple, ct::Tuple, len::Integer, i::Integer, revs::Tuple, formats::Tuple)
     # largest =  i
     # lson = i * 2
