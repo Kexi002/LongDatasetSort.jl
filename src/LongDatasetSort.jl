@@ -17,6 +17,7 @@ const LDS = LongDatasetSort
 
 export
     LDS,
+    longsort!,
     heapsort!,
     quicksort!,
     Dataset,

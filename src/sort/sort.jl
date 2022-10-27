@@ -1,8 +1,9 @@
-
 const QuickSort = QuickSortAlg()
 
 # Heap Sort by default
-function sort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true, alg::Base.Sort.Algorithm = HeapSortAlg())
+longsort!(ds::AbstractDataset, cols::ColumnIndex; rev = false, mapformats = true, alg::Base.Sort.Algorithm = HeapSortAlg()) = longsort!(ds, [cols], rev = rev, mapformats = mapformats, alg = alg)
+
+function longsort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true, alg::Base.Sort.Algorithm = HeapSortAlg())
     # Necessary?
     #_check_consistency(ds)
 
@@ -31,7 +32,7 @@ function sort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapform
     t = Tuple(IMD._columns(ds))
     ct = t[colsidx]
     
-    LDS.sort!(t, ct, revs, formats, alg)
+    longsort!(t, ct, revs, formats, alg)
     return ds
 end
 
@@ -39,8 +40,8 @@ end
 
 #Heap Sort
 heapsort!(ds::AbstractDataset, col::ColumnIndex; rev = false, mapformats = true) = heapsort!(ds, [col], rev = rev, mapformats = mapformats)
-heapsort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true) = LDS.sort!(ds, cols, rev = rev, mapformats = mapformats, alg = HeapSortAlg())
+heapsort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true) = longsort!(ds, cols, rev = rev, mapformats = mapformats, alg = HeapSortAlg())
 
 #Quick Sort
 quicksort!(ds::AbstractDataset, col::ColumnIndex; rev = false, mapformats = true) = quicksort!(ds, [col], rev = rev, mapformats = mapformats)
-quicksort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true) = LDS.sort!(ds, cols, rev = rev, mapformats = mapformats, alg = QuickSortAlg())
+quicksort!(ds::AbstractDataset, cols::MultiColumnIndex; rev = false, mapformats = true) = longsort!(ds, cols, rev = rev, mapformats = mapformats, alg = QuickSortAlg())

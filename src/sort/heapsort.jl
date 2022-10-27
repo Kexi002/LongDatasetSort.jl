@@ -56,6 +56,6 @@ function hsort!(t::Tuple, ct::Tuple, revs::Tuple, formats::Tuple)
     end
 end
 
-function sort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, revs::Tuple, formats::Tuple, ::IMD.HeapSortAlg)
+function longsort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, revs::Tuple, formats::Tuple, ::IMD.HeapSortAlg)
     hsort!(t, ct, revs, formats)
 end

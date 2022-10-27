@@ -134,7 +134,7 @@ function qsort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVecto
     end
 end
 
-function sort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, revs::Tuple, formats::Tuple, ::QuickSortAlg)
+function longsort!(t::Tuple{Vararg{AbstractVector}}, ct::Tuple{Vararg{AbstractVector}}, revs::Tuple, formats::Tuple, ::QuickSortAlg)
     # 1 allocation less than nrow(ds)? If pass a fixed value, allocation will not increase
     # len = nrow(ds)
     # For example, qsort!(t, ct, 1, 200, revs, formats)

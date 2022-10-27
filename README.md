@@ -2,7 +2,7 @@
 
 # Introduction
 
-`LongDatasetSort.jl` is a sort package based on the high-performance data processing package [InMemoryDatasets.jl](https://github.com/sl-solution/InMemoryDatasets.jl) (IMD), which provides in-place `sort!` function for the `Dataset` object of IMD. The package performance only considers avoiding extra allocations created by dataset sorting, enabling the sorting method to take up almost no space when dealing with large datasets with many rows.
+`LongDatasetSort.jl` is a sort package based on the high-performance data processing package [InMemoryDatasets.jl](https://github.com/sl-solution/InMemoryDatasets.jl) (IMD), which provides in-place sorting function `longsort!` for the `Dataset` object of IMD. The package performance only considers avoiding extra allocations created by dataset sorting, enabling the sorting method to take up almost no space when dealing with large datasets with many rows.
 
 # Features
 
@@ -10,7 +10,7 @@
     * Allocation does not increase as the row number of the `Dataset` increases
     * It will be fixed when the column number is less than or equals to 32
 
-* Provides Heap Sort and Quick Sort algorithms
+* Provide Heap Sort and Quick Sort algorithms
     * Use Heap Sort by default
     * Use Quick Sort may improve computational efficiency on large datasets
 
@@ -21,6 +21,10 @@
 * Same optional parameters as InMemoryDatasets, including `rev` and `mapformats`
     * Support sorting by different columns in a different order
     * Sort with or without formats
+
+* Provide alias functions
+    * Can use `heapsort!` and `quicksort!` function to specify algorithms instead of `alg` parameter
+    * The result of `quicksort!` will be equal to `longsort!(ds, cols, alg = QuickSort)`
 
 # Examples
 
@@ -38,9 +42,8 @@ julia> ds = Dataset(x = [5,4,3,2,1], y = [42,52,4,1,55])
    4 │        2         1
    5 │        1        55
 
-julia> sort!(ds, :x)
-5×2 Sorted Dataset
- Sorted by: x
+julia> longsort!(ds, :x)
+5×2 Dataset
  Row │ x         y
      │ identity  identity
      │ Int64?    Int64?
@@ -51,9 +54,8 @@ julia> sort!(ds, :x)
    4 │        4        52
    5 │        5        42
 
-julia> sort!(ds, "y", rev = true)
-5×2 Sorted Dataset
- Sorted by: y
+julia> longsort!(ds, "y", rev = true)
+5×2 Dataset
  Row │ x         y
      │ identity  identity
      │ Int64?    Int64?
@@ -76,9 +78,8 @@ julia> ds = Dataset(x = [5, 4, missing, 4],
    3 │  missing   missing
    4 │        4         1
 
-julia> sort!(ds, 1:2)
-4×2 Sorted Dataset
- Sorted by: x, y
+julia> longsort!(ds, 1:2)
+4×2 Dataset
  Row │ x         y
      │ identity  identity
      │ Int64?    Int64?
@@ -88,9 +89,8 @@ julia> sort!(ds, 1:2)
    3 │        5         3
    4 │  missing   missing
 
-julia> sort!(ds, [:x, :y], rev = [false, true])
-4×2 Sorted Dataset
- Sorted by: x, y
+julia> longsort!(ds, [:x, :y], rev = [false, true])
+4×2 Dataset
  Row │ x         y
      │ identity  identity
      │ Int64?    Int64?
@@ -139,9 +139,8 @@ julia> setformat!(ds, :date=>month)
    7 │ TX        2           134
    8 │ TX        2           188
 
-julia> sort(ds, [2,1])
-8×3 Sorted Dataset
- Sorted by: date, state
+julia> longsort!(ds, [2,1])
+8×3 Dataset
  Row │ state     date   qt
      │ identity  month  identity
      │ String?   Date?  Int64?
@@ -155,9 +154,8 @@ julia> sort(ds, [2,1])
    7 │ IL        3           199
    8 │ TX        3           143
 
-julia> sort(ds, [2,1], mapformats = false)
-8×3 Sorted Dataset
- Sorted by: date, state
+julia> longsort!(ds, [2,1], mapformats = false)
+8×3 Dataset
  Row │ state     date   qt
      │ identity  month  identity
      │ String?   Date?  Int64?
@@ -171,9 +169,8 @@ julia> sort(ds, [2,1], mapformats = false)
    7 │ TX        2           134
    8 │ CA        3           144
 
-julia> sort(ds, [1,2], mapformats = false)
-8×3 Sorted Dataset
- Sorted by: state, date
+julia> longsort!(ds, [1,2], mapformats = false)
+8×3 Dataset
  Row │ state     date   qt
      │ identity  month  identity
      │ String?   Date?  Int64?
@@ -198,7 +195,7 @@ julia> sort(ds, [1,2], mapformats = false)
 
 ## Heap Sort
 ### Running Time
-| nrow\function |            LDS.sort!            |               IMD.sort!               |
+| nrow\function |          LDS.longsort!          |               IMD.sort!               |
 |:-------------:|:-------------------------------:|:-------------------------------------:|
 |      1e2      |            0.000067s            |               0.000661s               |
 |      1e3      |            0.000880s            |               0.001539s               |
@@ -208,7 +205,7 @@ julia> sort(ds, [1,2], mapformats = false)
 |      1e7      |          148.868562s            |               4.001370s               |
 
 ### Allocations
-| nrow\function |            LDS.sort!            |               IMD.sort!               |
+| nrow\function |          LDS.longsort!          |               IMD.sort!               |
 |:-------------:|:-------------------------------:|:-------------------------------------:|
 |      1e2      |    13 allocations: 1.188 KiB    |    1.23 k allocations: 163.547 KiB    |
 |      1e3      |    13 allocations: 1.188 KiB    |    1.42 k allocations: 477.625 KiB    |
@@ -219,7 +216,7 @@ julia> sort(ds, [1,2], mapformats = false)
 
 ## Quick Sort
 ### Running Time
-| nrow\function |            LDS.sort!            |               IMD.sort!               |
+| nrow\function |          LDS.longsort!          |               IMD.sort!               |
 |:-------------:|:-------------------------------:|:-------------------------------------:|
 |      1e2      |            0.000048s            |               0.000879s               |
 |      1e3      |            0.000421s            |               0.001669s               |
@@ -229,7 +226,7 @@ julia> sort(ds, [1,2], mapformats = false)
 |      1e7      |           20.808912s            |               3.827429s               |
 
 ### Allocations
-| nrow\function |            LDS.sort!            |               IMD.sort!               |
+| nrow\function |          LDS.longsort!          |               IMD.sort!               |
 |:-------------:|:-------------------------------:|:-------------------------------------:|
 |      1e2      |    13 allocations: 1.188 KiB    |    1.23 k allocations: 163.047 KiB    |
 |      1e3      |    13 allocations: 1.188 KiB    |    1.41 k allocations: 477.469 KiB    |
