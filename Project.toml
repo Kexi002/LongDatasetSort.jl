@@ -1,7 +1,7 @@
 name = "LongDatasetSort"
 uuid = "3293fb92-4d5f-4840-a675-6a8c3e839d01"
 authors = ["Kexi002 <66058873+Kexi002@users.noreply.github.com> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 InMemoryDatasets = "5c01b14b-ab03-46ff-b164-14c663efdd9f"
