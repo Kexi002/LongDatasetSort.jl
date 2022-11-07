@@ -191,46 +191,46 @@ julia> longsort!(ds, [1,2], mapformats = false)
 
 * The testing `Dataset` is of type `Int64` with 1e2-1e7 rows and 32 columns. Randomly select 10 columns and convert them to Float type, and sort the dataset in ascending order according to the first three columns.
 
-* The result is given by built-in macro `@time`. Each test run ten times and take the minimum value.
+* The result is given by the macro `@benchmarkable` from package [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl). The copy of the testing `Dataset` has been set up before running the test to avoid extra time and allocations. The test result of running time takes the median value returned by `@benchmarkable`.
 
 ## Heap Sort
 ### Running Time
-| nrow\function |          LDS.longsort!          |               IMD.sort!               |
-|:-------------:|:-------------------------------:|:-------------------------------------:|
-|      1e2      |            0.000067s            |               0.000661s               |
-|      1e3      |            0.000880s            |               0.001539s               |
-|      1e4      |            0.015208s            |               0.003314s               |
-|      1e5      |            0.319796s            |               0.015386s               |
-|      1e6      |            9.283595s            |               0.387803s               |
-|      1e7      |          148.868562s            |               4.001370s               |
+| nrow\function |         LDS.longsort!          |             IMD.sort!              |
+|:-------------:|:------------------------------:|:----------------------------------:|
+|      1e2      |            46.600 μs           |             246.900 μs             |
+|      1e3      |           867.800 μs           |             375.800 μs             |
+|      1e4      |            28.397 ms           |               1.492 ms             |
+|      1e5      |           340.060 ms           |              11.174 ms             |
+|      1e6      |             9.283 s            |             391.984 ms             |
+|      1e7      |           148.782 s            |               4.440 s              |
 
 ### Allocations
-| nrow\function |          LDS.longsort!          |               IMD.sort!               |
-|:-------------:|:-------------------------------:|:-------------------------------------:|
-|      1e2      |    13 allocations: 1.188 KiB    |    1.23 k allocations: 163.547 KiB    |
-|      1e3      |    13 allocations: 1.188 KiB    |    1.42 k allocations: 477.625 KiB    |
-|      1e4      |    13 allocations: 1.188 KiB    |    1.57 k allocations: 3.427 MiB      |
-|      1e5      |    13 allocations: 1.188 KiB    |    1.49 k allocations: 32.948 MiB     |
-|      1e6      |    13 allocations: 1.188 KiB    |   11.43 k allocations: 328.655 MiB    |
-|      1e7      |    13 allocations: 1.188 KiB    |    2.17 k allocations: 3.204 GiB      |
+| nrow\function |         LDS.longsort!          |             IMD.sort!              |
+|:-------------:|:------------------------------:|:----------------------------------:|
+|      1e2      |    12 allocations: 1.06 KiB    |    1227 allocations: 163.12 KiB    |
+|      1e3      |    12 allocations: 1.06 KiB    |    1402 allocations: 477.20 KiB    |
+|      1e4      |    12 allocations: 1.06 KiB    |    1537 allocations:   3.43 MiB    |
+|      1e5      |    12 allocations: 1.06 KiB    |    1422 allocations:  32.94 MiB    |
+|      1e6      |    12 allocations: 1.06 KiB    |   11405 allocations: 328.65 MiB    |
+|      1e7      |    12 allocations: 1.06 KiB    |    2162 allocations:   3.20 GiB    |
 
 ## Quick Sort
 ### Running Time
-| nrow\function |          LDS.longsort!          |               IMD.sort!               |
-|:-------------:|:-------------------------------:|:-------------------------------------:|
-|      1e2      |            0.000048s            |               0.000879s               |
-|      1e3      |            0.000421s            |               0.001669s               |
-|      1e4      |            0.005738s            |               0.002692s               |
-|      1e5      |            0.077806s            |               0.013804s               |
-|      1e6      |            1.752185s            |               0.390505s               |
-|      1e7      |           20.808912s            |               3.827429s               |
+| nrow\function |         LDS.longsort!          |             IMD.sort!              |
+|:-------------:|:------------------------------:|:----------------------------------:|
+|      1e2      |            20.900 μs           |             244.500 μs             |
+|      1e3      |           378.300 μs           |             381.300 μs             |
+|      1e4      |             7.603 ms           |               1.505 ms             |
+|      1e5      |            86.040 ms           |              11.189 ms             |
+|      1e6      |             1.723 s            |             502.890 ms             |
+|      1e7      |            20.808 s            |               4.331 s              |
 
 ### Allocations
-| nrow\function |          LDS.longsort!          |               IMD.sort!               |
-|:-------------:|:-------------------------------:|:-------------------------------------:|
-|      1e2      |    13 allocations: 1.188 KiB    |    1.23 k allocations: 163.047 KiB    |
-|      1e3      |    13 allocations: 1.188 KiB    |    1.41 k allocations: 477.469 KiB    |
-|      1e4      |    13 allocations: 1.188 KiB    |    1.46 k allocations: 3.422 MiB      |
-|      1e5      |    13 allocations: 1.188 KiB    |    1.49 k allocations: 32.947 MiB     |
-|      1e6      |    13 allocations: 1.188 KiB    |    1.43 k allocations: 328.197 MiB    |
-|      1e7      |    13 allocations: 1.188 KiB    |    1.46 k allocations: 3.204 GiB      |
+| nrow\function |         LDS.longsort!          |             IMD.sort!              |
+|:-------------:|:------------------------------:|:----------------------------------:|
+|      1e2      |    12 allocations: 1.06 KiB    |    1221 allocations: 162.80 KiB    |
+|      1e3      |    12 allocations: 1.06 KiB    |    1399 allocations: 477.03 KiB    |
+|      1e4      |    12 allocations: 1.06 KiB    |    1435 allocations:   3.42 MiB    |
+|      1e5      |    12 allocations: 1.06 KiB    |    1412 allocations:  32.94 MiB    |
+|      1e6      |    12 allocations: 1.06 KiB    |    1404 allocations: 328.20 MiB    |
+|      1e7      |    12 allocations: 1.06 KiB    |    1455 allocations:   3.20 GiB    |
